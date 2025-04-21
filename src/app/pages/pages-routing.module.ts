@@ -29,7 +29,7 @@ const routes: Routes = [{
         .then(m => m.FormsModule),
     },
     {
-      path: 'CODMessage',
+      path: 'ui-features',
       loadChildren: () => import('./ui-features/ui-features.module')
         .then(m => m.UiFeaturesModule),
     },

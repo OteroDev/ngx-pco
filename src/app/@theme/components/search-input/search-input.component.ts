@@ -6,7 +6,7 @@ import { Component, ElementRef, EventEmitter, Output, ViewChild } from '@angular
   template: `
     <i class="control-icon ion ion-ios-search"
        (click)="showInput()"></i>
-    <input placeholder="Clique Enter para pesquisar..."
+    <input placeholder="Type your search request here..."
            #input
            [class.hidden]="!isInputShown"
            (blur)="hideInput()"

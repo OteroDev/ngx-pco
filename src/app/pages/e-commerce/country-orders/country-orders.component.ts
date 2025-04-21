@@ -1,44 +1,40 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NbMediaBreakpoint, NbMediaBreakpointsService, NbThemeService } from '@nebular/theme';
 import { takeWhile } from 'rxjs/operators';
-import { GeoHierarchicalData } from '../../../@core/data/geo-hierarchical-data';
+import { CountryOrderData } from '../../../@core/data/country-order';
 
 @Component({
-  selector: 'app-geo-hierarchical',
-  styleUrls: ['./country-orders/map/geo-hierarchical-map.component.scss'],
+  selector: 'ngx-country-orders',
+  styleUrls: ['./country-orders.component.scss'],
   template: `
     <nb-card [size]="breakpoint.width >= breakpoints.md ? 'medium' : 'giant'">
-      <nb-card-header>Hierarchical Map Statistics</nb-card-header>
+      <nb-card-header>Country Orders Statistics</nb-card-header>
       <nb-card-body>
-        <app-geo-hierarchical-map 
-          (selectEvent)="selectFeature($event)"
-          [currentLevel]="currentLevel">
-        </app-geo-hierarchical-map>
-        <app-geo-hierarchical-chart 
-          [featureName]="selectedFeatureName"
-          [data]="featureData"
-          [labels]="categories"
-          maxValue="20">
-        </app-geo-hierarchical-chart>
+        <ngx-country-orders-map (selectEvent)="selectCountryById($event)"
+                                countryId="USA">
+        </ngx-country-orders-map>
+        <ngx-country-orders-chart [countryName]="countryName"
+                                  [data]="countryData"
+                                  [labels]="countriesCategories"
+                                  maxValue="20">
+        </ngx-country-orders-chart>
       </nb-card-body>
     </nb-card>
   `,
 })
-export class GeoHierarchicalComponent implements OnInit, OnDestroy {
+export class CountryOrdersComponent implements OnInit, OnDestroy {
+
   private alive = true;
 
-  currentLevel = 'Superintendência'; // Nível hierárquico atual
-  selectedFeatureName = '';
-  featureData: number[] = [];
-  categories: string[] = [];
+  countryName = '';
+  countryData: number[] = [];
+  countriesCategories: string[];
   breakpoint: NbMediaBreakpoint = { name: '', width: 0 };
   breakpoints: any;
 
-  constructor(
-    private themeService: NbThemeService,
-    private breakpointService: NbMediaBreakpointsService,
-    private geoHierarchicalService: GeoHierarchicalData
-  ) {
+  constructor(private themeService: NbThemeService,
+              private breakpointService: NbMediaBreakpointsService,
+              private countryOrderService: CountryOrderData) {
     this.breakpoints = this.breakpointService.getBreakpointsMap();
   }
 
@@ -48,21 +44,20 @@ export class GeoHierarchicalComponent implements OnInit, OnDestroy {
       .subscribe(([oldValue, newValue]) => {
         this.breakpoint = newValue;
       });
-
-    this.geoHierarchicalService.getHierarchyCategories(this.currentLevel)
+    this.countryOrderService.getCountriesCategories()
       .pipe(takeWhile(() => this.alive))
-      .subscribe((categories) => {
-        this.categories = categories;
+      .subscribe((countriesCategories) => {
+        this.countriesCategories = countriesCategories;
       });
   }
 
-  selectFeature(featureName: string) {
-    this.selectedFeatureName = featureName;
+  selectCountryById(countryName: string) {
+    this.countryName = countryName;
 
-    this.geoHierarchicalService.getHierarchyData(this.currentLevel, featureName)
+    this.countryOrderService.getCountriesCategoriesData(countryName)
       .pipe(takeWhile(() => this.alive))
-      .subscribe((data) => {
-        this.featureData = data;
+      .subscribe((countryData) => {
+        this.countryData = countryData;
       });
   }
 
